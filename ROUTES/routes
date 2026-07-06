@@ -4,7 +4,7 @@ const db=require("../db.js")
 router.get("/testing",(req,res)=>{
     res.send("hello world");
 })
-
+//GET ALL TASKS
 router.get("/allstudents",(req,res)=>{
     
     db.query("SELECT * FROM students",[],(error,result)=>{
@@ -15,4 +15,20 @@ router.get("/allstudents",(req,res)=>{
         res.status(200).json(result.rows)
     })
 })
+
+//GET TASK BY ID
+router.get("/:id",(req,res)=>{
+    const id=req.params.id;
+    db.query("SELECT * FROM students WHERE id=$1",[id],(error,result)=>{
+        if(error){
+            console.log(error)
+            return res.status(400).json({"error":"server side error, failed to retrieve data"})
+        }
+        if(result.rows.length===0){
+            return res.status(400).json({"error":"person not found"})
+        }       
+        return res.status(200).json(result.rows)
+    })
+})
+router
 module.exports=router;

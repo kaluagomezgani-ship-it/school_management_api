@@ -7,9 +7,6 @@ const app=express();
 app.use(express.json());
 
 app.use("/school",paths);
-// app.get("/",(rep,res)=>{
-//     res.status(200).json({"message":"successful"})
-// })
 
 app.listen("3000", ()=>{
     console.log("server is running")
