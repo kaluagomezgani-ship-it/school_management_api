@@ -4,7 +4,7 @@ const db=require("../db.js")
 router.get("/testing",(req,res)=>{
     res.send("hello world");
 })
-//GET ALL TASKS
+//GET ALL students
 router.get("/allstudents",(req,res)=>{
     
     db.query("SELECT * FROM students",[],(error,result)=>{
@@ -16,7 +16,7 @@ router.get("/allstudents",(req,res)=>{
     })
 })
 
-//GET TASK BY ID
+//GET a student BY ID
 router.get("/:id",(req,res)=>{
     const id=req.params.id;
     db.query("SELECT * FROM students WHERE id=$1",[id],(error,result)=>{
@@ -30,5 +30,16 @@ router.get("/:id",(req,res)=>{
         return res.status(200).json(result.rows)
     })
 })
-router
+
+//add a new student 
+router.post("/add",(req,res)=>{
+    const {fname,lname,age,email,course}=req.body;
+    db.query("INSERT INTO students (firstname,lastname,age,email,course) VALUES ($1,$2,$3,$4,$5) RETURNING id",[fname,lname,age,email,course],(error,result)=>{
+        if(error){
+            return res.status(500).json({"error":"failed to add student"})
+        }
+        return res.status(201).json({message:"succesfull added a student", id:result.rows[0].id})
+    })
+})
+
 module.exports=router;
