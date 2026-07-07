@@ -41,5 +41,31 @@ router.post("/add",(req,res)=>{
         return res.status(201).json({message:"succesfull added a student", id:result.rows[0].id})
     })
 })
+//edit a students details
+router.put("/edit/:id",(req,res)=>{
+    const{fname,lname,age,email,course}=req.body;
+    const id = req.params.id;
+
+    db.query("UPDATE students SET fname = COALESCE($1, fname),lname = COALESCE($2, lname),age = COALESCE($3, age),email = COALESCE($4, email),course = COALESCE($5, course) WHERE id=$6 RETURNING id",[fname,lname,age,email,course,id],(error,result)=>{
+        if(error){
+            return res.status(500).json({"error":"failed to add student"})
+        }
+        if(result.rowCount===0){
+            return res.status(404).json({ error: "Student not found." });
+        }
+        return res.status(201).json({message:"succesfull edited student", id:result.rows[0].id})
+    })
+})
+//deleting a student by id
+router.delete("/delete/:id",(req,res)=>{
+    const id = req.params.id;
+
+    db.query("DELETE FROM students WHERE id=$1",[id],(error,result)=>{
+        if(error){
+            return res.status(500).json({"error":"failed to add student"})
+        }
+        return res.status(200).json({Message:"succefully deleted student"})
+    })
+})
 
 module.exports=router;
