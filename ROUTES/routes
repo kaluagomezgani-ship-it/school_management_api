@@ -5,19 +5,19 @@ router.get("/testing",(req,res)=>{
     res.send("hello world");
 })
 //GET ALL students
-router.get("/allstudents",(req,res)=>{
+router.get("/students",(req,res)=>{
     
     db.query("SELECT * FROM students",[],(error,result)=>{
         if (error){
             console.log(error);
-            res.status(500).json({"error":"an error occured with the request"})
+            return res.status(500).json({"error":"an error occured with the request"})
         }
-        res.status(200).json(result.rows)
+        return res.status(200).json(result.rows)
     })
 })
 
 //GET a student BY ID
-router.get("/:id",(req,res)=>{
+router.get("/students/:id",(req,res)=>{
     const id=req.params.id;
     db.query("SELECT * FROM students WHERE id=$1",[id],(error,result)=>{
         if(error){
@@ -25,14 +25,14 @@ router.get("/:id",(req,res)=>{
             return res.status(400).json({"error":"server side error, failed to retrieve data"})
         }
         if(result.rows.length===0){
-            return res.status(400).json({"error":"person not found"})
+            return res.status(404).json({"error":"person not found"})
         }       
         return res.status(200).json(result.rows)
     })
 })
 
 //add a new student 
-router.post("/add",(req,res)=>{
+router.post("/students",(req,res)=>{
     const {fname,lname,age,email,course}=req.body;
     db.query("INSERT INTO students (firstname,lastname,age,email,course) VALUES ($1,$2,$3,$4,$5) RETURNING id",[fname,lname,age,email,course],(error,result)=>{
         if(error){
@@ -42,11 +42,11 @@ router.post("/add",(req,res)=>{
     })
 })
 //edit a students details
-router.put("/edit/:id",(req,res)=>{
+router.put("/students/:id",(req,res)=>{
     const{fname,lname,age,email,course}=req.body;
     const id = req.params.id;
 
-    db.query("UPDATE students SET fname = COALESCE($1, fname),lname = COALESCE($2, lname),age = COALESCE($3, age),email = COALESCE($4, email),course = COALESCE($5, course) WHERE id=$6 RETURNING id",[fname,lname,age,email,course,id],(error,result)=>{
+    db.query("UPDATE students SET firstname = COALESCE($1, firstname),lastname = COALESCE($2, lastname),age = COALESCE($3, age),email = COALESCE($4, email),course = COALESCE($5, course) WHERE id=$6 RETURNING id",[fname,lname,age,email,course,id],(error,result)=>{
         if(error){
             return res.status(500).json({"error":"failed to add student"})
         }
@@ -57,7 +57,7 @@ router.put("/edit/:id",(req,res)=>{
     })
 })
 //deleting a student by id
-router.delete("/delete/:id",(req,res)=>{
+router.delete("/students/:id",(req,res)=>{
     const id = req.params.id;
 
     db.query("DELETE FROM students WHERE id=$1",[id],(error,result)=>{
